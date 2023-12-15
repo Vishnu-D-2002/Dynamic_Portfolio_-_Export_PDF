@@ -7,7 +7,7 @@ const { JWT_SECRET } = require("../config");
 const userController = {
     
     signup: async (req, res) => {
-        const { firstName, lastName , email, password } = req.body;
+        const { firstName, lastName, email, password } = req.body;
 
         try {
             const user = await User.findOne({ email });
@@ -29,7 +29,7 @@ const userController = {
             return res.status(500).json({ message: "Email already exists please login" });
         } catch (error) {
             console.error(error);
-            res.status(500).json({ message: "Internal Server Error" ,error});
+            res.status(500).json({ message: "Internal Server Error", error });
         }
     },
 
@@ -37,69 +37,69 @@ const userController = {
         
         const { email, password } = req.body;
         try {
-            const user = await User.findOne({ email , activated :true });
+            const user = await User.findOne({ email, activated: true });
 
-        if (!user) {
-            return res.status(401).json({ message: "User not found" });
-        }
+            if (!user) {
+                return res.status(401).json({ message: "User not found" });
+            }
 
-        const passwordMatch = await bcrypt.compare(password, user.passwordHash);
+            const passwordMatch = await bcrypt.compare(password, user.passwordHash);
 
-        if (!passwordMatch) {
-            return res.status(404).json({ message: "Password is wrong" });
-        }
+            if (!passwordMatch) {
+                return res.status(404).json({ message: "Password is wrong" });
+            }
 
-        const token = jwt.sign({ email, id:user._id }, JWT_SECRET);
+            const token = jwt.sign({ email, id: user._id }, JWT_SECRET);
 
-        return res.status(200).json({ message: "Login successfully ", token, user });
+            return res.status(200).json({ message: "Login successfully ", token, user });
         }
         catch (error) {
             console.error(error);
-            res.status(500).json({ message: "Internal Server Error",error });
+            res.status(500).json({ message: "Internal Server Error", error });
         }
 
     },
 
     activationLink: async (req, res) => {
         try {
-         const { email } = req.params;
+            const { email } = req.params;
 
-        const user = await User.findOne({ email });
+            const user = await User.findOne({ email });
 
-        if (!user) {
-            return res.status(401).json({ message: "User not found" });
-        }
-
-        const activationToken = Math.random().toString(36).slice(-7);
-
-        user.activationToken=activationToken;
-        await user.save();
-            
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: '143.lovvable@gmail.com',
-                pass: 'fnmxhibtwjgdzajq'
-            },
-        });
-
-        const message = {
-        from: '143.lovvable@gmail.com',
-        to: email,
-        subject: 'Account Activation Link',
-        text: `You are requested to Activate your Account ,Click below Link to Activate
-        https://main--splendid-cat-8425a0.netlify.app/activate/${activationToken}`
-        }
-
-        transporter.sendMail(message, (err, info) => {
-            if (err) {
-                res.status(404).json({ message: "something went wrong,try again !" });
+            if (!user) {
+                return res.status(401).json({ message: "User not found" });
             }
-            res.status(200).json({ message: "Activation Link sent successfully" , info });
-        })
+
+            const activationToken = Math.random().toString(36).slice(-7);
+
+            user.activationToken = activationToken;
+            await user.save();
+            
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: '143.lovvable@gmail.com',
+                    pass: 'fnmxhibtwjgdzajq'
+                },
+            });
+
+            const message = {
+                from: '143.lovvable@gmail.com',
+                to: email,
+                subject: 'Account Activation Link',
+                text: `You are requested to Activate your Account ,Click below Link to Activate
+        https://main--splendid-cat-8425a0.netlify.app/activate/${activationToken}`
+            }
+
+            transporter.sendMail(message, (err, info) => {
+                if (err) {
+                    res.status(404).json({ message: "something went wrong,try again !" });
+                }
+                res.status(200).json({ message: "Activation Link sent successfully", info });
+            })
         } catch (error) {
-             console.error(error);
-            res.status(500).json({ message: "Internal Server Error",error });
+            console.error(error);
+            res.status(500).json({ message: "Internal Server Error", error });
         }
     },
 
@@ -111,7 +111,7 @@ const userController = {
   
             if (user) {
                 user.activationToken = null,
-                user.activated = true
+                    user.activated = true
                 await user.save();
                 res.json({ message: "Account Activated Succeessfully" });
             }
@@ -120,50 +120,50 @@ const userController = {
             }
         } catch (error) {
             console.error(error);
-            res.status(500).json({ message: "Internal Server Error",error });
+            res.status(500).json({ message: "Internal Server Error", error });
         }
     },
 
     resetPassword: async (req, res) => {
         try {
-         const { email } = req.body;
+            const { email } = req.body;
 
-        const user = await User.findOne({ email });
+            const user = await User.findOne({ email });
 
-        if (!user) {
-            return res.status(401).json({ message: "User not found" });
-        }
-
-        const randomString = Math.random().toString(36).slice(-7);
-
-        user.randomString=randomString;
-        await user.save();
-            
-        const transporter = nodemailer.createTransport({
-            service: 'gmail',
-            auth: {
-                user: '143.lovvable@gmail.com',
-                pass: 'fnmxhibtwjgdzajq'
-            },
-        });
-
-        const message = {
-        from: '143.lovvable@gmail.com',
-        to: email,
-        subject: 'Password Reset Link',
-        text: `You are requested to change the password of user login ,So please click this url
-        https://main--splendid-cat-8425a0.netlify.app/resetPassword/${randomString}`
-        }
-
-        transporter.sendMail(message, (err, info) => {
-            if (err) {
-                res.status(404).json({ message: "something went wrong,try again !" });
+            if (!user) {
+                return res.status(401).json({ message: "User not found" });
             }
-            res.status(200).json({ message: "Email sent successfully" , info });
-        })
+
+            const randomString = Math.random().toString(36).slice(-7);
+
+            user.randomString = randomString;
+            await user.save();
+            
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: '143.lovvable@gmail.com',
+                    pass: 'fnmxhibtwjgdzajq'
+                },
+            });
+
+            const message = {
+                from: '143.lovvable@gmail.com',
+                to: email,
+                subject: 'Password Reset Link',
+                text: `You are requested to change the password of user login ,So please click this url
+        https://main--splendid-cat-8425a0.netlify.app/resetPassword/${randomString}`
+            }
+
+            transporter.sendMail(message, (err, info) => {
+                if (err) {
+                    res.status(404).json({ message: "something went wrong,try again !" });
+                }
+                res.status(200).json({ message: "Email sent successfully", info });
+            })
         } catch (error) {
-             console.error(error);
-            res.status(500).json({ message: "Internal Server Error",error });
+            console.error(error);
+            res.status(500).json({ message: "Internal Server Error", error });
         }
     },
 
@@ -171,13 +171,13 @@ const userController = {
         try {
             const { randomString, newPassword } = req.body;
 
-            const stringMatches = await User.findOne({randomString});
+            const stringMatches = await User.findOne({ randomString });
 
             if (!stringMatches) {
                 return res.status(500).json({ message: "OTP is Incorrect" });
             }
 
-            const passwordHash = await bcrypt.hash(newPassword, 10); 
+            const passwordHash = await bcrypt.hash(newPassword, 10);
 
             const user = await User.findOneAndUpdate(
                 { email: stringMatches.email },
@@ -203,7 +203,7 @@ const userController = {
     allusers: async (req, res) => {
         try {
             const users = await User.find();
-            res.status(200).json({ message: "All users are fetched successfullly" ,users});
+            res.status(200).json({ message: "All users are fetched successfullly", users });
         } catch (error) {
             console.error(error);
             res.status(500).json({ message: "Internal Server Error", error });
@@ -231,6 +231,43 @@ const userController = {
     //     }
     // }
 
+    resumeData: async (req, res) => {
+        try {
+            const {
+                additionalDetails,
+                educationDetails,
+                personalDetails,
+                studentDetails,
+            } = req.body;
+
+            const newUser = new User({
+                resumeModel: {
+                    additionalDetails,
+                    educationDetails,
+                    personalDetails,
+                    studentDetails,
+                },
+            });
+
+            await newUser.save();
+
+            res.status(200).json({ message: "Resume data saved successfully" });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: "Error in Resume Data posting", error: error.message });
+        }
+    },
+
+    getResumeModel: async (req, res) => {
+        try {
+            const { email } = req.body;
+            const user = await User.findOne({ email, resumeModel });
+
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: "Error in Resume Data getting", error: error.message });
+        }
+    }
 };
 
 module.exports = userController;

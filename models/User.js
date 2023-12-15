@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default:false,
     },
+    resumeModel:Array
 }, { versionKey: false })
 
 const User= mongoose.model('User', userSchema);

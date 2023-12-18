@@ -217,6 +217,7 @@ const userController = {
                 educationDetails,
                 personalDetails,
                 studentDetails,
+                experience
             } = req.body;
 
             const userId = req.userId;
@@ -228,6 +229,7 @@ const userController = {
                     educationDetails,
                     personalDetails,
                     studentDetails,
+                    experience
                 }})
             } else {
                 console.log('user not found');
